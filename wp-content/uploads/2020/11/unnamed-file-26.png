@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<Error>
+	<Code>AccessDenied</Code>
+	<Message>You are denied by bucket referer rule</Message>
+	<Resource>cd-1256167341.cos.ap-chengdu.myqcloud.com/Trojan/trojaninstall4.png</Resource>
+	<RequestId>NWZiYjRjMDZfMjViMjU4NjRfYjFlOF80ZTJmMWYz</RequestId>
+	<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODc0OWRkZjk0ZDM1NmI1M2E2MTRlY2MzZDhmNmI5MWI1OWI2NmQ0YjJkZWE3NjcxYTUzN2Q1NDQzNjY0ZmI3ZTMyM2I1YWE1ZWQ4NTUwMjQ4N2M2YzA0ZWQxYmEzYWRlMTc=</TraceId>
+</Error>
+

@@ -1,0 +1,130 @@
+docker run -itd --restart=always --network bridge-host --ip=192.168.1.238 --name gphotos-syne pch18/baota
+
+vi /etc/ssh/sshd_config   开启ssh
+
+开始运行
+/usr/local/bin/gphotos-sync /tmp
+
+后台运行
+nohup /usr/local/bin/gphotos-sync /tmp &
+
+4/uAHuhAhFP6tNwn5rMvcAN28k-LXplDYgcEyeq1XfA0B34BO2UoNZ_rc
+
+附 rclone 卸载方法：
+sudo rm /usr/bin/rclone && sudo rm /usr/local/share/man/man1/rclone.1
+
+输入命令：rpm -qa | grep ssh
+　　注：若没安装SSH则可输入：yum install openssh-server安装。
+　　3、启动SSH服务。
+　　输入命令：systemctl restart  sshd 重启SSH服务。
+　　命令：systemctl start sshd 启动服务 |  命令：systemctl stop sshd 停止服务 
+　　重启后可输入：netstat -antp | grep sshd 查看是否启动22端口（可略）。
+4、如何设置SSH服务为开机启动？
+　　输入命令：systemctl enable sshd 即可。
+　　注：若是systemctl disable sshd 则禁止SSH开机启动。
+
+rclone 安装
+执行命令：curl https://rclone.org/install.sh | sudo bash
+
+/usr/local/bin/gphotos-sync /tmp
+运行一次：
+/usr/local/bin/gphotos-sync /tmp --db-path /tmp/db --flush-index --use-hardlinks --max-retries 12 --max-threads 16
+
+索引完，自动挂掉，然后 crontab 定时根据第一次索引自动重试下载
+
+*/30 * * * * /usr/local/bin/gphotos-sync /tmp --db-path /tmp/db --skip-index --use-hardlinks  --max-retries 12 --max-threads 16 >/dev/null 2>&1 &
+
+初次同步完成，可以修改定时任务，自动备份，比如，每天凌晨8点执行备份：
+crontab -e
+0 8 * * * /usr/local/bin/gphotos-sync /tmp --db-path /tmp/db --flush-index --use-hardlinks --max-retries 12 --max-threads 16 > /dev/null 2>&1 &
+
+
+gphotos-sync 把 GooglePhotos 相册下载到 VPS 本地：
+screen -S gphotos-sync
+/usr/local/bin/gphotos-sync /tmp  --use-hardlinks  --flush-index --max-retries 10 --max-threads 16
+
+screen -S /usr/local/bin/gphotos-sync /tmp  --use-hardlinks  --flush-index --max-retries 10 --max-threads 16
+
+
+/usr/bin/rclone mount tesk /ppp --allow-other --allow-non-empty --buffer-size 256M --vfs-cache-mode writes --write-back-cache -v &
+
+rclone mount test:/ O: --cache-dir d:\OneDriveTemp --allow-other --vfs-cache-mode writes --allow-non-empty
+
+/usr/bin/rclone mount gdrive: /gd/disk --allow-other --allow-non-empty --vfs-cache-mode writes
+
+启动
+rclone mount gd: /gd/disk --allow-other --allow-non-empty --vfs-cache-mode writes
+
+./rclone-v1.43-linux-amd64/rclone mount gdrive: /gdrive/disk --allow-other --allow-non-empty --vfs-cache-mode writes
+
+四、挂载网盘
+
+复制以下命令到终端或者SSH工具中执行：
+
+yum install fuse -y
+
+apt-get install fuse -y
+
+mkdir /root/gphotos
+mkdir /root/onedrive
+mkdir /root/gdrive
+
+rclone mount one:/ /root/1drive --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000
+
+ok
+后台自动挂载onedrive
+nohup rclone mount onedrive:/ /home/onedrive --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 &
+后台自动挂载gphotos
+nohup rclone mount gphotos:/ /home/gphotos --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 &
+
+同步ok
+nohup /usr/bin/rclone sync gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+nohup rclone mount gdrive:/ /root/gdrive --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 &
+
+nohup rclone mount gphotos:media/by-month /root/gphotos &
+
+nohup rclone mount onedrive:/ /home/onedrive
+nohup rclone mount gphotos:/ /home/gphotos
+
+温馨提示：Google Photos 下一般有三个大目录 media、album 和 shared-album，而 media 还分按年（by-year）、按月（by-month）和按日（by-day），如果不指定，会三种分类都会备份下来，照片就会有两份重复。一般建议 by-month 方式。
+
+
+每2小时执行一次  crontab -e
+
+* */3 * * * /usr/bin/rclone sync gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+* 2 * * * /usr/bin/rclone sync gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+后台执行
+
+nohup /usr/bin/rclone copy gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+
+
+复制
+* */5 * * * nohup rclone copy gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+crontab -e
+0 2 * * * nohup rclone copy gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+nohup rclone mount onedrive:/ /root/onedrive --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 &
+
+
+ok
+/usr/bin/rclone sync gphotos:media/by-month onedrive:gp/media/by-month > /dev/null 2>&1 &
+
+复制
+nohup rclone copy gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+crontab -e
+0 2 * * * nohup rclone copy gphotos:media/by-month onedrive:gphotos > /dev/null 2>&1 &
+
+
+
+
+
+onedrive token
+
+{"access_token":"eyJ0eXAiOiJKV1QiLCJub25jZSI6IkUzTm00RkJvOHR5UlVFUG91LWs1Wml0aDFNYmtIYkt1amg4OUt5VWNMOEEiLCJhbGciOiJSUzI1NiIsIng1dCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyIsImtpZCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8yZWM2ZGQxMi0xOWUzLTRhYWMtYjgyMS1kYWFjNTZkNTk4ZDYvIiwiaWF0IjoxNTc1OTg1ODE2LCJuYmYiOjE1NzU5ODU4MTYsImV4cCI6MTU3NTk4OTcxNiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IjQyVUFnbC9Pano5SVNwckt2Uk1OQ2RRU1ZMNnhiMW52ZWYvZ2hVbEIvNmZJZjdxbUNBQT0iLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6InJjbG9uZSIsImFwcGlkIjoiYjE1NjY1ZDktZWRhNi00MDkyLTg1MzktMGVlYzM3NmFmZDU5IiwiYXBwaWRhY3IiOiIxIiwiZmFtaWx5X25hbWUiOiJ6aG91IiwiZ2l2ZW5fbmFtZSI6ImppZSIsImlwYWRkciI6IjExOS4yMzcuMTM3LjExMiIsIm5hbWUiOiJ6aG91amllIiwib2lkIjoiNmQwMzA3YWItYmQ5OC00ODc5LThmNjYtNzM0MTU5NGNmYzM5IiwicGxhdGYiOiIzIiwicHVpZCI6IjEwMDNCRkZEQUY0MTY2NjciLCJzY3AiOiJGaWxlcy5SZWFkIEZpbGVzLlJlYWQuQWxsIEZpbGVzLlJlYWRXcml0ZSBGaWxlcy5SZWFkV3JpdGUuQWxsIHByb2ZpbGUgb3BlbmlkIGVtYWlsIiwic2lnbmluX3N0YXRlIjpbImttc2kiXSwic3ViIjoiYy1aRUpyTVAwYWRwcmhqc25oTFM1TGtxVmxYcDlMWXBRcmx4Ni1xdE1pTSIsInRpZCI6IjJlYzZkZDEyLTE5ZTMtNGFhYy1iODIxLWRhYWM1NmQ1OThkNiIsInVuaXF1ZV9uYW1lIjoiemhvdWppZTIxOEAxLmpqa2wuYWMubnoiLCJ1cG4iOiJ6aG91amllMjE4QDEuamprbC5hYy5ueiIsInV0aSI6Im5lT0hZYTJaSmtLaGVTYXZqTk1tQUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfc3QiOnsic3ViIjoiLTlta3pMYmNJazl4eEtvTnJhUVRBSV9WMk1HMU9lMGxza0pyUjhqaFVBYyJ9LCJ4bXNfdGNkdCI6MTUzMTIyMzg0NH0.kGGbMnD4wy3rYJxDhsOC6ilLN2pof--KqA1a3DfWRPjHsf1mCDZ86CEL1DUAWQKK1hVZMEo5TsfReHiVCmfYRI2KmwVx2VkyO7_860R1PkjMyVkNJ7sBytqhzR84va211rtsofqHu2GIf7Ix5rAZe-XuZwTmM_JuNqMrMPDwk8RSh4gfpn9jjAwh6BTiYr-D8teZYb6nFpABAmX9XHurqrLlXrzqfkjrO9jOjN5-0I714u1eNsmSCzZ_KY6nFERR7VvGzrz5Q93J5GIjKbUIC47h_kbm8FeyS6IZGGcAwpfGmMEUZqEpL5mI1z18kLkRm0ZVBue8sJLEu9QRE8phwg","token_type":"Bearer","refresh_token":"OAQABAAAAAACQN9QBRU3jT6bcBQLZNUj76uxSaSRI4aGQFnMObhHMmx6hswtB9Plh6Q0mFG6ZMS15R5VGXPtWU-nrZvFBqEnJWoBjzq8RyDRL9Ql3OuZzrEVRyTaFmqSZ0ni4pgiiE-_FauNuptK6D9hCCH9ZA16yMn6jzQOfwhwxd-RD4t-PJp2RBDoGA8ahGoUggsEMduxkDbLCqb2HWtOCyTla8daTsgdjYxmqF7ojiUUkXgxcifaAxSEFJ2CzQLwmaOMQ_arzmmHBo52x8RG9iwa9MfC4qjUwakzJXeVt63UAOCh3P8F9Hk0oWURQ7YxRrpPdOuC4EmU5FouTE2OgQyXHVfJzl1-NY6WbdV97hY9vMlHFkm_C9CQYO-vtKpungHoRIK7zH9D5InMDzCZlbtZOpB3Umec8USqfJ2IoS4sqLcT2lqCWPswaSgsp81OWIyrGXQn3RZ8zkWYuIZRLUaq_5rrwoCgiANYzV-1QzNIDQ_fFH0snIbHXF1yVbA2xPP6mJBz11Zl2lni-YdczM6MRev2E2PWT_sfmU2eYCnTbGct8VLS_36QPi1enXQ3RGvopDSL4_cDX3PSW_Or_dLUDCNC6sXiYzXSvivRhhMn4J1uGRZsZXWAKyLe7Nnv_Alw5FaYhNvDKWs-HaIMTKh46BEj_EjOLKyylHtB0nwYn8McByQ8kR-nvdO8KY1l_XsFMiLji3gFIVGR4J1vPH7S1UxKCltIVdKDfvhxQrq4qybU3qXr1Ax2CkP8_BODCQwQVk3gTMpa_9GX3MPPlh6V_k0lTbFMknjzoiOy7VS8y2NzJWtYgOgji7TogXXsBrBJuo4DMwmpdvUUmN9-qjRLP6pAMIAA","expiry":"2019-12-10T22:55:17.1098072+08:00"}
+
+

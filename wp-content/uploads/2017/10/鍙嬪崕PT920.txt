@@ -1,0 +1,26 @@
+第一步：打开下面的连接（建议使用chrome浏览器,ie无法正常显示）
+
+
+http://www.xwj321.com/csrf.html#eyJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjEvY2dpLWJpbi90ZWxuZXQuYXNwIiwiYXV0b3N1Ym1pdCI6ZmFsc2UsInRhcmdldCI6Il90b3AiLCJkYXRhIjoidGVsbmV0X2ZsYWc9MSZ0ZWxuZXRlbmFibGVfZmxhZz1ObyZsYW5fdGVsbmV0ZW5hYmxlX2ZsYWc9WWVzJndhbl90ZWxuZXRlbmFibGVfZmxhZz1OJTJGQSZsYW5fZW5hYmxldGVsbmV0PW9uJj0mIiwibWV0aG9kIjoiUE9TVCJ9
+
+
+
+
+
+
+第二步：点击提交
+
+显示下图的页面就说明已经成功开启telnet了，默认帐号密码为
+admin 1234
+
+
+第三步：获取超级密码
+打开cmd? telnet 192.168.1.1 登录到光猫，按顺序输入下面两行代码，就可以看到超级密码了。
+
+cd /tmp
+cat ctromfile.cfg | grep 'telecomadmin'
+
+
+一般都是像下面这种格式的
+
+telecomadmin75007875
